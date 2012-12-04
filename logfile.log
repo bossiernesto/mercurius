@@ -1,0 +1,4 @@
+[[1mtest[0m] at [MainThread][[1;37mINFO[0m]  Info Test ([1mloggerTest.py[0m:21) at 2012-12-04 17:35:43,997.997]
+[[1mtest[0m] at [MainThread][[1;33mWARNING[0m]  Warning 1 ([1mloggerTest.py[0m:30) at 2012-12-04 17:35:43,997.997]
+[[1mtest[0m] at [MainThread][[1;31mERROR[0m]  Error 1 ([1mloggerTest.py[0m:31) at 2012-12-04 17:35:43,997.997]
+[[1mtest[0m] at [MainThread][[1;31mERROR[0m]  Error 2 ([1mloggerTest.py[0m:32) at 2012-12-04 17:35:43,997.997]
