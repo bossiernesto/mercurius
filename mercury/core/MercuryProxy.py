@@ -1,6 +1,8 @@
 from SocketServer import ThreadingMixIn
 from BaseHTTPServer import HTTPServer
-
+from mercury.config.AppContext import *
+from ProxyHandler import ProxyHandler
+import socket
 
 class ThreadedHTTPServer(ThreadingMixIn,HTTPServer):
     """Threaded HTTPServer to thread many requests"""
@@ -9,3 +11,12 @@ class ThreadedHTTPServer(ThreadingMixIn,HTTPServer):
 
 class MercuryProxyServer(ThreadedHTTPServer):
     pass
+
+def buildMercuryServer():
+    hostname=socket.gethostname()
+    port=appContext().get(MERCURY,"port")
+    mercuryInstance=ThreadedHTTPServer((hostname,port),ProxyHandler)
+    return mercuryInstance
+
+def execMercury(mercuryInstance):
+    mercuryInstance.serve_forever()
