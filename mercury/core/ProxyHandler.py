@@ -14,7 +14,7 @@ class ProxyHandler(BaseHTTPRequestHandler):
         self.supported_services=['http','ftp','https']
         self.server_version="Mercury "+ __version__
         self.protocol_version="http" #TODO: extract this from appContext
-        super(ProxyHandler,self).__init__
+        super(ProxyHandler,self).__init__()
 
     def supportedService(self,scheme,fragment):
         if(scheme not in self.supported_services) or fragment:
@@ -31,8 +31,8 @@ class ProxyHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         (scheme, netloc, path, params, query, fragment) = urlparse.urlparse(self.path)
         try:
-            self.supported_services(scheme,fragment)
-            soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self.supportedService(scheme,fragment)
+            soc=socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.delegateActionByScheme(scheme)
         except MercuryUnsupportedService:
             self.send_error(400,"Bad URL: %s" % self.path)
@@ -47,22 +47,28 @@ class ProxyHandler(BaseHTTPRequestHandler):
 
     def _read_write(self, soc, max_idling=20, local=False):
         iw = [self.connection, soc]
-    local_data = ""
-    ow = []
-    count = 0
-    while 1:
-        count += 1
-        (ins, _, exs) = select.select(iw, ow, iw, 1)
-        if exs: break
-        if ins:
-            for i in ins:
-                if i is soc: out = self.connection
-                else: out = soc
-                data = i.recv(8192)
-                if data:
-                    if local: local_data += data
-                    else: out.send(data)
-                    count = 0
-        if count == max_idling: break
-    if local: return local_data
-    return None
+        local_data = ""
+        ow = []
+        count = 0
+        while 1:
+            count += 1
+            (ins, _, exs) = select.select(iw, ow, iw, 1)
+            if exs: break
+            if ins:
+                for i in ins:
+                    if i is soc: out=self.connection
+                    else: out=soc
+                    data=i.recv(8192)
+                    if data:
+                        if local: local_data += data
+                        else: out.send(data)
+                        count = 0
+            if count == max_idling: break
+        if local: return local_data
+        return None
+
+    def log_error(self, format, *args):
+        pass
+
+    def log_message(self, format, *args):
+        pass

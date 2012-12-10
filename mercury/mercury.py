@@ -1,5 +1,5 @@
 import sys
-from mercury.config.AppContext import *
+from config.AppContext import *
 from mercury.logger.coloredFormater import *
 from logging import FileHandler
 
