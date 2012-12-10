@@ -18,7 +18,7 @@ MERCURY="MERCURY"
 
 setting_template=[(LOG,[("LOG_FILE",MERCURY_ROOT+"/logfile.log"),("LOG_NAME","mercury_log"),("OUTPUT_STDOUT",False)]),
                   ('DocumentalDB',[("COUCH_DB_NAME",'http://localhost:5984')]),
-                  ('General',[("SHOW_DEBUG_INFO",0),("MERCURY_ROOT_DIR",MERCURY_ROOT),("SECTION_DESCRIPTOR",MASTER_CATALOG)]),
+                  (MERCURY,[("SHOW_DEBUG_INFO",0),("MERCURY_ROOT_DIR",MERCURY_ROOT),("SECTION_DESCRIPTOR",MASTER_CATALOG),('verbose',True)]),
                   (MASTER_CATALOG,[(LOG,LOG),(DOCUMENTAL_DB,"Document"),(MERCURY,MERCURY)]) #Do not modify this like
 ]
 

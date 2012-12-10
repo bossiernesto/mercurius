@@ -23,3 +23,10 @@ def host_url_port(url):
         url = url + '?' + url_tuple[4]
 
     return host, port, url
+
+
+def host_port(netloc):
+    i=netloc.find(':')
+    if i>=0:
+        return netloc[:i], int(netloc[i+1:])
+    return netloc, 80
