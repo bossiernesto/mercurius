@@ -1,8 +1,8 @@
 from BaseHTTPServer import BaseHTTPRequestHandler
 from mercury.exceptions import  MercuryUnsupportedService,MercuryConnectException
-from mercury.config.AppContext import *
 from MercuryHandlers import *
-import mercury.useful.socketcommon as socketcommon, socket,select,urlparse,mercury.useful.common as common
+import socket,select,urlparse
+from mercury.core import *
 
 class ProxyHandler(BaseHTTPRequestHandler):
 
@@ -11,9 +11,12 @@ class ProxyHandler(BaseHTTPRequestHandler):
 
     def __init__(self):
         self.supported_services=['http','ftp','https']
-        self.server_version="Mercury "+ __version__
+        self.server_version="Mercury "+ mercury.__version__
         self.protocol_version="http" #TODO: extract this from appContext
-        super(ProxyHandler,self).__init__()
+        if common.pythonver_applies('3.0.0'):
+            super().__init__()
+        else:
+            super(ProxyHandler,self).__init__()
         self.protocolDispatcher={"http":handleHTTP,"ftp":handleFTP}
         self.logger=common.getLogger()
 
@@ -21,7 +24,7 @@ class ProxyHandler(BaseHTTPRequestHandler):
         if(scheme not in self.supported_services) or fragment:
             raise MercuryUnsupportedService()
 
-    def _conect_to(self,netloc,sock):
+    def _connect_to(self,netloc,sock):
         host_port = socketcommon.host_port(netloc)
         self.logger.info( "connect to %s:%d", host_port[0], host_port[1])
         try: sock.connect(host_port)
@@ -34,7 +37,7 @@ class ProxyHandler(BaseHTTPRequestHandler):
     def do_CONNECT(self):
         try:
             sock=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-            sock.setblocking(0)#TODO: Finish function
+            sock.setblocking(0)
             self._connect_to(self.path, sock)
             message=self.protocol_version +" 200 Connection established\r\n"
             self.log_request(message)
