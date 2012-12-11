@@ -1,6 +1,7 @@
-from mercury.useful import *
+from mercury.useful import common
 from mercury.logger.coloredLogger import MercuryLogger
 import sys
+from mercury import *
 
 def getLogger():
     return appContext().getObject(MercuryLogger)

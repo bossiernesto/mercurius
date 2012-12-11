@@ -53,13 +53,15 @@ class ProxyHandler(BaseHTTPRequestHandler):
             self.connection.close()
 
     def do_GET(self):
-        (scheme, netloc, path, params, query, fragment) = urlparse.urlparse(self.path)
+        path = urlparse.urlparse(self.path) #(scheme, netloc, path, params, query, fragment)
         try:
-            self.supportedService(scheme,fragment)
+            self.supportedService(path.scheme,path.fragment)
             sock=socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self.delegateActionByScheme(scheme,sock)
+            self.delegateActionByScheme(path.scheme,sock,self,path)
         except MercuryUnsupportedService:
             self.send_error(400,"Bad URL: %s" % self.path)
+        except MercuryConnectException:
+            self.logger.error("Unable to establish connection with host %s",self.path)
         finally:
             sock.close()
             self.connection.close()
@@ -69,9 +71,9 @@ class ProxyHandler(BaseHTTPRequestHandler):
     do_DELETE=do_GET
     do_HEAD=do_GET
 
-    def delegateActionByScheme(self,scheme,socket):
+    def delegateActionByScheme(self,scheme,socket,handler,path):
         dispatch=self.protocolDispatcher[scheme]   #get handler function according to scheme
-        dispatch(socket) #call it
+        dispatch(socket,handler,path) #call it
 
     def _read_write(self, soc, max_idling=20, local=False):
         iw = [self.connection, soc]
