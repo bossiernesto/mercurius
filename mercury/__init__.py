@@ -1,7 +1,3 @@
-from useful.common import *
-from mercury.config.AppContext import *
-
-__author__ = 'b03418'
 
 #Package version
 MAJOR_VERSION='0'

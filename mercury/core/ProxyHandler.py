@@ -14,6 +14,7 @@ from mercury.exceptions import  MercuryUnsupportedService,MercuryConnectExceptio
 from MercuryHandlers import *
 import socket,select,urlparse
 from mercury.core import *
+from mercury.config.AppContext import *
 
 class ProxyHandler(BaseHTTPRequestHandler):
 
@@ -21,8 +22,8 @@ class ProxyHandler(BaseHTTPRequestHandler):
     __base_handle = __base.handle
 
     def __init__(self):
-        self.server_version=appContext().getValue("Version")
-        self.protocol_version=appContext().getValue("Protocol_Version")
+        self.server_version=appContext.getInstance().getValue("Version")
+        self.protocol_version=appContext.getInstance().getValue("Protocol_Version")
         if common.pythonver_applies('3.0.0'):
             super().__init__()
         else:
@@ -53,7 +54,7 @@ class ProxyHandler(BaseHTTPRequestHandler):
             message=self.protocol_version +" 200 Connection established\r\n"
             self.log_request(message)
             self.wfile.write(message)
-            if appContext.get(MERCURY,'verbose'):
+            if appContext.getInstance().get(MERCURY,'verbose'):
                 self.wfile.write("Proxy-agent: %s\r\n" % self.version_string())
             self.wfile.write("\r\n")
             self._read_write(sock, 300)

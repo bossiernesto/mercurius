@@ -10,6 +10,7 @@
 """
 from urlparse import urlunparse
 from mercury import *
+from mercury.useful import common
 import ftplib
 
 def handleHTTP(socket,handler,path):

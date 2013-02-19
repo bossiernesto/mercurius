@@ -23,7 +23,7 @@ class MercuryProxyServer(ThreadingMixIn,HTTPServer):
 
 def buildMercuryServer():
     hostname=socket.gethostname()
-    port=appContext().get(MERCURY,"port")
+    port=appContext.getInstance.get(MERCURY,"port")
     mercuryInstance=MercuryProxyServer((hostname,port),ProxyHandler)
     return mercuryInstance
 
