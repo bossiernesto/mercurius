@@ -1,3 +1,14 @@
+"""
+.. module:: Mercury Proxy
+   :platform: Linux
+   :synopsis: HTTP/S and FTP local Proxy
+   :copyright: (c) 2012-2013 by Ernesto Bossi.
+   :license: MIT.
+
+.. moduleauthor:: Ernesto Bossi <bossi.ernestog@gmail.com>
+
+"""
+
 from SocketServer import ThreadingMixIn
 from BaseHTTPServer import HTTPServer
 from mercury.config.AppContext import *

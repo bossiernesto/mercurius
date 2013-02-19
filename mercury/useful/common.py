@@ -1,4 +1,14 @@
-from mercury.useful import common
+"""
+.. module:: Common functions for mercurius
+   :platform: Linux
+   :synopsis: function helpers for Mercurius
+   :copyright: (c) 2012-2013 by Ernesto Bossi.
+   :license: MIT.
+
+.. moduleauthor:: Ernesto Bossi <bossi.ernestog@gmail.com>
+
+"""
+
 from mercury.logger.coloredLogger import MercuryLogger
 import sys
 from mercury import *

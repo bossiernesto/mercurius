@@ -1,3 +1,13 @@
+"""
+.. module:: Mercury Handlers
+   :platform: Linux
+   :synopsis: HTTP/S and FTP local Proxy
+   :copyright: (c) 2012-2013 by Ernesto Bossi.
+   :license: MIT.
+
+.. moduleauthor:: Ernesto Bossi <bossi.ernestog@gmail.com>
+
+"""
 from urlparse import urlunparse
 from mercury import *
 import ftplib

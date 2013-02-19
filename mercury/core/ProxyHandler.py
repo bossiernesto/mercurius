@@ -1,3 +1,14 @@
+"""
+.. module:: Mercury Proxy Handler
+   :platform: Linux
+   :synopsis: HTTP/S and FTP local Proxy
+   :copyright: (c) 2012-2013 by Ernesto Bossi.
+   :license: MIT.
+
+.. moduleauthor:: Ernesto Bossi <bossi.ernestog@gmail.com>
+
+"""
+
 from BaseHTTPServer import BaseHTTPRequestHandler
 from mercury.exceptions import  MercuryUnsupportedService,MercuryConnectException
 from MercuryHandlers import *
@@ -10,8 +21,8 @@ class ProxyHandler(BaseHTTPRequestHandler):
     __base_handle = __base.handle
 
     def __init__(self):
-        self.server_version="Mercury "+ mercury.__version__
-        self.protocol_version="http" #TODO: extract this from appContext
+        self.server_version=appContext().getValue("Version")
+        self.protocol_version=appContext().getValue("Protocol_Version")
         if common.pythonver_applies('3.0.0'):
             super().__init__()
         else:

@@ -1,6 +1,18 @@
+"""
+.. module:: AppContext
+   :platform: Linux
+   :synopsis: AppContext using configParser
+   :copyright: (c) 2012 by Ernesto Bossi.
+   :license: MIT.
+
+.. moduleauthor:: Ernesto Bossi <bossi.ernestog@gmail.com>
+
+"""
+
 import ConfigParser,io,inspect
 from mercury.useful.singleton import Singleton
 from mercury.exceptions import ConfigError
+from mercury import __version__
 import os
 
 path = os.getcwd()
@@ -16,9 +28,13 @@ DOCUMENTAL_DB="DocumentalDB"
 LOG="Log"
 MERCURY="MERCURY"
 
+#Mercurius Server Settings
+PROTOCOL_VERSION="Protocol_Version"
+
 setting_template=[(LOG,[("LOG_FILE",MERCURY_ROOT+"/logfile.log"),("LOG_NAME","mercury_log"),("OUTPUT_STDOUT",False)]),
                   ('DocumentalDB',[("COUCH_DB_NAME",'http://localhost:5984')]),
-                  (MERCURY,[("SHOW_DEBUG_INFO",0),("MERCURY_ROOT_DIR",MERCURY_ROOT),("SECTION_DESCRIPTOR",MASTER_CATALOG),('verbose',True)]),
+                  (MERCURY,[("SHOW_DEBUG_INFO",0),("MERCURY_ROOT_DIR",MERCURY_ROOT),("SECTION_DESCRIPTOR",MASTER_CATALOG),('verbose',True),
+                      ("Version","Mercury"+__version__),(PROTOCOL_VERSION,"http")]),
                   (MASTER_CATALOG,[(LOG,LOG),(DOCUMENTAL_DB,"Document"),(MERCURY,MERCURY)]) #Do not modify this like
 ]
 
