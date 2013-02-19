@@ -1,5 +1,3 @@
-__author__ = 'b03418'
-
 import mercury.daemon
 from unittest import TestCase
 

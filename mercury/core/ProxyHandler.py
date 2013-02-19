@@ -10,14 +10,14 @@ class ProxyHandler(BaseHTTPRequestHandler):
     __base_handle = __base.handle
 
     def __init__(self):
-        self.supported_services=['http','ftp','https']
         self.server_version="Mercury "+ mercury.__version__
         self.protocol_version="http" #TODO: extract this from appContext
         if common.pythonver_applies('3.0.0'):
             super().__init__()
         else:
             super(ProxyHandler,self).__init__()
-        self.protocolDispatcher={"http":handleHTTP,"ftp":handleFTP}
+        self.protocolDispatcher={"http":handleHTTP,"ftp":handleFTP,"https":handleHTTP}
+        self.supported_services=[key for (key,value) in self.protocolDispatcher.iteritems()]
         self.logger=common.getLogger()
 
     def supportedService(self,scheme,fragment):

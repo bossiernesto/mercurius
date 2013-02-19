@@ -2,7 +2,6 @@ from urlparse import urlunparse
 from mercury import *
 import ftplib
 
-#TODO: code handlers
 def handleHTTP(socket,handler,path):
     # path -> (scheme, netloc, path, params, query, fragment)
     handler._connect_to(path.netloc,socket)
@@ -14,6 +13,7 @@ def handleHTTP(socket,handler,path):
                                handler.request_version))
     handler.headers['Connection'] = 'close'
     del handler.headers['Proxy-Connection'] #TODO: use a decorator to be able to modify the package status
+                                            #TODO: Add hook to delegate enabled plug-ins
     for key_val in handler.headers.items():
         socket.send("%s: %s\r\n" % key_val)
     socket.send("\r\n")
