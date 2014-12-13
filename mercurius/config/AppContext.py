@@ -12,9 +12,9 @@ __version__ = '0.0.1'
 import configparser
 import io
 import inspect
-from mercury.useful.singleton import Singleton
-from mercury.exceptions import ConfigError
-from mercury.logger.loggerDecorator import AbstractLogger
+from mercurius.useful.singleton import Singleton
+from mercurius.exceptions import ConfigError
+from mercurius.logger.loggerDecorator import AbstractLogger
 import os
 
 path = os.getcwd()
@@ -148,12 +148,12 @@ def getAppContext():
     return appContext.getInstance()
 
 
-ONYXLOGGER = 'MERCURY_LOGGER'
+MERCURIUSLOGGER = 'MERCURIUS_LOGGER'
 
 
 def getMercuryLogger():
     try:
-        return getAppContext().getValue(ONYXLOGGER)
+        return getAppContext().getValue(MERCURIUSLOGGER)
     except ConfigError:
         return None
 
@@ -162,7 +162,7 @@ def setMercuryLogger(logger):
     try:
         if not isinstance(logger, AbstractLogger):
             raise ConfigError('{0} is not an AbstractLogger to Register in AppContext'.format(logger))
-        getAppContext().set_property(LOG, ONYXLOGGER, logger)
+        getAppContext().set_property(LOG, MERCURIUSLOGGER, logger)
     except configparser.NoSectionError:
         getAppContext().build_defaultsettings()
         setMercuryLogger(logger)

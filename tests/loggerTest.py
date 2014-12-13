@@ -1,6 +1,6 @@
-from mercury.logger.coloredLogger import ColoredLogger,AbstractLogger
-from mercury.logger.MockLoggingHandler import MockLoggingHandler
-from mercury.config.AppContext import appContext
+from mercurius.logger.coloredLogger import ColoredLogger,AbstractLogger
+from mercurius.logger.MockLoggingHandler import MockLoggingHandler
+from mercurius.config.AppContext import appContext
 from unittest import TestCase
 
 class testLogger(TestCase):

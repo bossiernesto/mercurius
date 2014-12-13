@@ -9,7 +9,7 @@
 
 """
 from urllib.parse import urlunparse
-from mercury.config.AppContext import getMercuryLogger
+from mercurius.config.AppContext import getMercuryLogger
 import ftplib
 
 def handleHTTP(socket,handler,path):

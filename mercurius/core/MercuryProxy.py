@@ -11,7 +11,7 @@
 
 from socketserver import ThreadingMixIn
 from http.server import HTTPServer
-from mercury.config.AppContext import *
+from mercurius.config.AppContext import *
 from .ProxyHandler import ProxyHandler
 import socket
 

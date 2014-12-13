@@ -12,11 +12,11 @@
 """
 
 from http.server import BaseHTTPRequestHandler
-from mercury.exceptions import  MercuryUnsupportedService,MercuryConnectException
+from mercurius.exceptions import  MercuryUnsupportedService,MercuryConnectException
 from .MercuryHandlers import *
 import socket,select,urllib.parse
-from mercury.core import *
-from mercury.config.AppContext import *
+from mercurius.core import *
+from mercurius.config.AppContext import *
 
 class ProxyHandler(BaseHTTPRequestHandler):
 
@@ -71,7 +71,7 @@ class ProxyHandler(BaseHTTPRequestHandler):
             self.connection.close()
 
     def version_string(self):
-        from mercury.useful.common import bytedecode
+        from mercurius.useful.common import bytedecode
         bytedecode(self.server_version) + ' ' + self.sys_version
 
     def do_GET(self):

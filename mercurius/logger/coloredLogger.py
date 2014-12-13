@@ -1,7 +1,7 @@
 import logging
 from .coloredFormater import *
 from abc import ABCMeta
-from mercury.config.AppContext import *
+from mercurius.config.AppContext import *
 
 class AbstractLogger(logging.Logger):
 

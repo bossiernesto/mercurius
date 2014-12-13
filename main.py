@@ -1,5 +1,5 @@
-from mercury.mercury import Mercury
+from mercurius.mercurius import Mercurius
 
 if __name__ == '__main__':
-    Mercury().run()
+    Mercurius().run()
 

@@ -1,6 +1,6 @@
 import unittest
-from mercury.config.AppContext import *
-from mercury.useful import singleton
+from mercurius.config.AppContext import *
+from mercurius.useful import singleton
 
 class AppContextTestCase(unittest.TestCase):
 

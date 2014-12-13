@@ -1,8 +1,8 @@
-from mercury.mercury import MercuryDaemon, DEFAULT_DAEMON_PATH
+from mercurius.mercurius import MercuriusDaemon, DEFAULT_DAEMON_PATH
 import sys
 
 if __name__ == "__main__":
-        daemon=MercuryDaemon(DEFAULT_DAEMON_PATH)
+        daemon=MercuriusDaemon(DEFAULT_DAEMON_PATH)
         if len(sys.argv) == 2:
                 if 'start' == sys.argv[1]:
                         daemon.start()

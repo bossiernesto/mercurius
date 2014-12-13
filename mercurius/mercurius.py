@@ -2,13 +2,13 @@ import sys
 from .config.AppContext import *
 from .logger.coloredLogger import *
 from logging import FileHandler, INFO
-from mercury.core.MercuryProxy import execMercury
+from mercurius.core.MercuryProxy import execMercury
 from .daemon import *
-from mercury.useful.common import bytedecode
+from mercurius.useful.common import bytedecode
 
 FORMAT = "[%(name)-s][%(levelname)-s]  %(message)s (%(filename)s:%(lineno)d) at %(asctime)-15s"
 
-class Mercury:
+class Mercurius:
     def run(self):
         appContext.getInstance().build_defaultsettings()
         log_name = bytedecode(appContext.get(LOG, b'log_name'))
@@ -21,14 +21,14 @@ class Mercury:
         logger.addHandler(file_handler)
         logger.setLevel(INFO)
         setMercuryLogger(logger)
-        #instantiate a mercury Proxy
+        #instantiate a mercurius Proxy
         execMercury()
 
 
-class MercuryDaemon(Daemon):
+class MercuriusDaemon(Daemon):
     """Mercury Daemon that uses code from the base class"""
     def run(self):
-        mercury = Mercury()
+        mercury = Mercurius()
         mercury.run()
 
 

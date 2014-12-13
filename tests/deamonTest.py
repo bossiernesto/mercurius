@@ -1,4 +1,4 @@
-import mercury.daemon
+import mercurius.daemon
 from unittest import TestCase
 
 
