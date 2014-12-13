@@ -5,6 +5,8 @@
    :copyright: (c) 2012-2013 by Ernesto Bossi.
    :license: MIT.
 
+   special thanks to Suzuki, Hisao
+
 .. moduleauthor:: Ernesto Bossi <bossi.ernestog@gmail.com>
 
 """
@@ -117,6 +119,7 @@ class ProxyHandler(BaseHTTPRequestHandler):
                         else: out.send(data)
                         count = 0
             if count == max_idling:
+                #this is now a simple print, in the future it should be reifying this to an object, parse the http header to able to process it
                 print(debug_data.decode('utf-8','ignore'))
                 break
         if local:
