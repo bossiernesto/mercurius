@@ -28,7 +28,7 @@ class Daemon:
             if pid > 0:
                 # exit first parent
                 sys.exit(0)
-        except OSError, e:
+        except OSError as e:
             sys.stderr.write("fork #1 failed: %d (%s)\n" % (e.errno, e.strerror))
             sys.exit(1)
 
@@ -43,16 +43,16 @@ class Daemon:
             if pid > 0:
                 # exit from second parent
                 sys.exit(0)
-        except OSError, e:
+        except OSError as e:
             sys.stderr.write("fork #2 failed: %d (%s)\n" % (e.errno, e.strerror))
             sys.exit(1)
 
         # redirect standard file descriptors
         sys.stdout.flush()
         sys.stderr.flush()
-        si = file(self.stdin, 'r')
-        so = file(self.stdout, 'a+')
-        se = file(self.stderr, 'a+', 0)
+        si = open(self.stdin, 'r')
+        so = open(self.stdout, 'a+')
+        se = open(self.stderr, 'a+')
         os.dup2(si.fileno(), sys.stdin.fileno())
         os.dup2(so.fileno(), sys.stdout.fileno())
         os.dup2(se.fileno(), sys.stderr.fileno())
@@ -60,7 +60,7 @@ class Daemon:
         # write pidfile
         atexit.register(self.delpid)
         pid = str(os.getpid())
-        file(self.pidfile,'w+').write("%s\n" % pid)
+        open(self.pidfile,'w+').write("%s\n" % pid)
 
     def delpid(self):
         os.remove(self.pidfile)
@@ -71,7 +71,7 @@ class Daemon:
           """
         # Check for a pidfile to see if the daemon already runs
         try:
-            pf = file(self.pidfile,'r')
+            pf = open(self.pidfile,'r')
             pid = int(pf.read().strip())
             pf.close()
         except IOError:
@@ -92,7 +92,7 @@ class Daemon:
           """
         # Get the pid from the pidfile
         try:
-            pf = file(self.pidfile,'r')
+            pf = open(self.pidfile,'r')
             pid = int(pf.read().strip())
             pf.close()
         except IOError:
@@ -108,13 +108,13 @@ class Daemon:
             while 1:
                 os.kill(pid, SIGTERM)
                 time.sleep(0.1)
-        except OSError, err:
+        except OSError as err:
             err = str(err)
             if err.find("No such process") > 0:
                 if os.path.exists(self.pidfile):
                     os.remove(self.pidfile)
             else:
-                print str(err)
+                print(str(err))
                 sys.exit(1)
 
     def restart(self):
@@ -130,15 +130,24 @@ class Daemon:
           daemonized by start() or restart().
           """
 
-class MercuryDaemon(Daemon):
-    """Mercury Daemon that uses code from the base class"""
-    def run(self):
-        while True:
-            time.sleep(1)
-
-
-DEFAULT_DAEMON_PATH='/tmp/mercurydaemon.pid'
-
-def buildDaemon():
-    daemon=MercuryDaemon(DEFAULT_DAEMON_PATH)
-    daemon.start()
+# class MyDaemon(Daemon):
+#         def run(self):
+#                 while True:
+#                         time.sleep(1)
+#
+# if __name__ == "__main__":
+#         daemon = MyDaemon('/tmp/daemon-example.pid')
+#         if len(sys.argv) == 2:
+#                 if 'start' == sys.argv[1]:
+#                         daemon.start()
+#                 elif 'stop' == sys.argv[1]:
+#                         daemon.stop()
+#                 elif 'restart' == sys.argv[1]:
+#                         daemon.restart()
+#                 else:
+#                         print("Unknown command")
+#                         sys.exit(2)
+#                 sys.exit(0)
+#         else:
+#                 print("usage: %s start|stop|restart" % sys.argv[0])
+#                 sys.exit(2)

@@ -1,5 +1,5 @@
 import logging
-import coloredFormater as c
+from .coloredFormater import *
 from abc import ABCMeta
 from mercury.config.AppContext import *
 
@@ -12,19 +12,24 @@ class AbstractLogger(logging.Logger):
 
 
 # Custom logger class with multiple destinations
-class MercuryLogger(AbstractLogger):
-    FORMAT = "[$BOLD%(name)-s$RESET] at [%(threadName)s][%(levelname)-s]  %(message)s ($BOLD%(filename)s$RESET:%(lineno)d) at %(asctime)-15s.%(msecs)03d]"
+import logging
+from . import coloredFormater as c
+from .loggerDecorator import AbstractLogger
+
+FORMAT = "[$BOLD%(name)-s$RESET][%(levelname)-s]  %(message)s ($BOLD%(filename)s$RESET:%(lineno)d) at %(asctime)-15s"
+
+# Custom logger class with multiple destinations
+class ColoredLogger(AbstractLogger):
     COLOR_FORMAT = c.formatter_message(FORMAT, True)
-    def __init__(self, name):
+
+    def __init__(self, name, file_name=None):
         logging.Logger.__init__(self, name, logging.DEBUG)
+        self.fileName= file_name if file_name else 'logfile.log'
 
         color_formatter = c.ColoredFormatter(self.COLOR_FORMAT)
 
-        logfile=appContext().get(LOG,"LOG_FILE")
+        console = logging.StreamHandler()
+        console.setFormatter(color_formatter)
 
-        filehandler = logging.RotatingFileHandler(logfile,maxBytes=(log_size*(1<<20)),backupCount=5)
-        filehandler.setFormatter(color_formatter)
-
-        self.addHandler(filehandler)
-        logging.setLoggerClass(MercuryLogger)
-        return
+        self.addHandler(console)
+        logging.setLoggerClass(ColoredLogger)

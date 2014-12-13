@@ -1,5 +1,5 @@
 import string
-from  urlparse import urlparse
+from  urllib.parse import urlparse
 
 def host_url_port(url):
     url_tuple=urlparse(url)

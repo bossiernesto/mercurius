@@ -1,4 +1,4 @@
-from mercury.logger.coloredLogger import MercuryLogger,AbstractLogger
+from mercury.logger.coloredLogger import ColoredLogger,AbstractLogger
 from mercury.logger.MockLoggingHandler import MockLoggingHandler
 from mercury.config.AppContext import appContext
 from unittest import TestCase
@@ -7,15 +7,15 @@ class testLogger(TestCase):
 
     TEST_LOGGER='test'
 
-    appContext().build_defaultsettings()
+    appContext.getInstance().build_defaultsettings()
 
     def setUp(self):
-        self.logger=MercuryLogger(self.TEST_LOGGER)
+        self.logger=ColoredLogger(self.TEST_LOGGER)
         self.handler=MockLoggingHandler()
         self.logger.addHandler(self.handler)
 
     def testCallLogger(self):
-        self.assertIsInstance(self.logger,MercuryLogger)
+        self.assertIsInstance(self.logger,ColoredLogger)
 
     def testLogInfo(self):
         self.logger.info('Info Test')

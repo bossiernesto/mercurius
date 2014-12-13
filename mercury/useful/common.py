@@ -9,16 +9,14 @@
 
 """
 
-from mercury.logger.coloredLogger import MercuryLogger
-import sys
-from mercury import *
+import inspect
 
-def getLogger():
-    return appContext().getObject(MercuryLogger)
+def get_current_method_name():
+    """Auxiliary function to not to do DRY"""
+    return inspect.stack()[1][3]
 
-def pythonver_applies(version):
-    """"Compare if python version is same or greater"""
-    return tuple([int(x) for x in version.split('.')]) <= sys.version_info
+def bytedecode(bytestring):
+    return str(bytestring,'utf-8')
 
-def ifdebug():
-    return appContext().getValue("SHOW_DEBUG_INFO")==True
+def encode_str(string):
+    str.encode(string)

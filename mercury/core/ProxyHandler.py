@@ -9,10 +9,10 @@
 
 """
 
-from BaseHTTPServer import BaseHTTPRequestHandler
+from http.server import BaseHTTPRequestHandler
 from mercury.exceptions import  MercuryUnsupportedService,MercuryConnectException
-from MercuryHandlers import *
-import socket,select,urlparse
+from .MercuryHandlers import *
+import socket,select,urllib.parse
 from mercury.core import *
 from mercury.config.AppContext import *
 
@@ -21,16 +21,21 @@ class ProxyHandler(BaseHTTPRequestHandler):
     __base =BaseHTTPRequestHandler
     __base_handle = __base.handle
 
-    def __init__(self):
-        self.server_version=appContext.getInstance().getValue("Version")
-        self.protocol_version=appContext.getInstance().getValue("Protocol_Version")
-        if common.pythonver_applies('3.0.0'):
-            super().__init__()
-        else:
-            super(ProxyHandler,self).__init__()
+    def __init__(self, request, client_address, server):
+        self.server_version=appContext.getInstance().get(MERCURY,b'version')
+        self.protocol_version="HTTP/1.1"
         self.protocolDispatcher={"http":handleHTTP,"ftp":handleFTP,"https":handleHTTP}
-        self.supported_services=[key for (key,value) in self.protocolDispatcher.iteritems()]
-        self.logger=common.getLogger()
+        self.supported_services=[key for (key,value) in self.protocolDispatcher.items()]
+        self.logger=getMercuryLogger()
+        super().__init__(request, client_address, server)
+
+    def handle(self):
+        (ip, port) =  self.client_address
+        if hasattr(self, 'allowed_clients') and ip not in self.allowed_clients:
+            self.raw_requestline = self.rfile.readline()
+            if self.parse_request(): self.send_error(403)
+        else:
+            self.__base_handle()
 
     def supportedService(self,scheme,fragment):
         if(scheme not in self.supported_services) or fragment:
@@ -40,7 +45,7 @@ class ProxyHandler(BaseHTTPRequestHandler):
         host_port = socketcommon.host_port(netloc)
         self.logger.info( "connect to %s:%d", host_port[0], host_port[1])
         try: sock.connect(host_port)
-        except socket.error, arg:
+        except socket.error as arg:
             try: msg = arg[1]
             except: msg = arg
             self.send_error(404, msg)
@@ -49,14 +54,13 @@ class ProxyHandler(BaseHTTPRequestHandler):
     def do_CONNECT(self):
         try:
             sock=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-            sock.setblocking(0)
             self._connect_to(self.path, sock)
             message=self.protocol_version +" 200 Connection established\r\n"
             self.log_request(message)
-            self.wfile.write(message)
+            self.wfile.write(str.encode(message))
             if appContext.getInstance().get(MERCURY,'verbose'):
-                self.wfile.write("Proxy-agent: %s\r\n" % self.version_string())
-            self.wfile.write("\r\n")
+                self.wfile.write(str.encode("Proxy-agent: %s\r\n" % self.version_string()))
+            self.wfile.write(str.encode("\r\n"))
             self._read_write(sock, 300)
         except MercuryConnectException:
             self.logger.error("Unable to establish connection with host %s",self.path)
@@ -64,18 +68,23 @@ class ProxyHandler(BaseHTTPRequestHandler):
             sock.close()
             self.connection.close()
 
+    def version_string(self):
+        from mercury.useful.common import bytedecode
+        bytedecode(self.server_version) + ' ' + self.sys_version
+
     def do_GET(self):
-        path = urlparse.urlparse(self.path) #(scheme, netloc, path, params, query, fragment)
+        path = urllib.parse.urlparse(self.path) #(scheme, netloc, path, params, query, fragment)
         try:
             self.supportedService(path.scheme,path.fragment)
-            sock=socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self.delegateActionByScheme(path.scheme,sock,self,path)
+            self.sock=socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self.delegateActionByScheme(path.scheme,self.sock,self,path)
         except MercuryUnsupportedService:
             self.send_error(400,"Bad URL: %s" % self.path)
         except MercuryConnectException:
             self.logger.error("Unable to establish connection with host %s",self.path)
         finally:
-            sock.close()
+            if hasattr(self,'sock'):
+                self.sock.close()
             self.connection.close()
 
     do_POST=do_GET
@@ -89,7 +98,8 @@ class ProxyHandler(BaseHTTPRequestHandler):
 
     def _read_write(self, soc, max_idling=20, local=False):
         iw = [self.connection, soc]
-        local_data = ""
+        local_data = b''
+        debug_data = b''
         ow = []
         count = 0
         while 1:
@@ -100,17 +110,22 @@ class ProxyHandler(BaseHTTPRequestHandler):
                 for i in ins:
                     if i is soc: out=self.connection
                     else: out=soc
-                    data=i.recv(8192)
+                    data = i.recv(8192)
+                    debug_data += data
                     if data:
                         if local: local_data += data
                         else: out.send(data)
                         count = 0
-            if count == max_idling: break
-        if local: return local_data
+            if count == max_idling:
+                print(debug_data.decode('utf-8','ignore'))
+                break
+        if local:
+            return local_data
+        print(debug_data.decode('utf-8','ignore'))
         return None
 
     def format_log(self,format,*args):
-        return "%s - - [%s] %s\n" %(self.address_string(),self.log_date_time_string(),format%args)
+        return "{0} - - [{1}] {2}\n".format(self.address_string(),self.log_date_time_string(),format % args[0])
 
     def log_error(self, format, *args):
         self.logger.error(self.format_log(format,args))

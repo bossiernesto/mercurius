@@ -9,23 +9,23 @@
 
 """
 
-from SocketServer import ThreadingMixIn
-from BaseHTTPServer import HTTPServer
+from socketserver import ThreadingMixIn
+from http.server import HTTPServer
 from mercury.config.AppContext import *
-from ProxyHandler import ProxyHandler
+from .ProxyHandler import ProxyHandler
 import socket
 
 #ThreadedHTTPServer
 class MercuryProxyServer(ThreadingMixIn,HTTPServer):
     """Threaded HTTPServer to thread many requests"""
-    def __init__ (self, server_address, RequestHandlerClass, logger=None):
-        HTTPServer.__init__ (self, server_address,RequestHandlerClass)
+    pass
 
 def buildMercuryServer():
     hostname=socket.gethostname()
-    port=appContext.getInstance.get(MERCURY,"port")
+    port=appContext.getInstance().get(MERCURY,"port")
     mercuryInstance=MercuryProxyServer((hostname,port),ProxyHandler)
     return mercuryInstance
 
-def execMercury(mercuryInstance):
-    mercuryInstance.serve_forever()
+def execMercury():
+    import http.server
+    http.server.test(ProxyHandler, MercuryProxyServer)

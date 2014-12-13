@@ -1,1 +1,1 @@
-from mercury import *
+__author__ = 'b03418'

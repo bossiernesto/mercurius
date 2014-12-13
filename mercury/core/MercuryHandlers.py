@@ -8,26 +8,25 @@
 .. moduleauthor:: Ernesto Bossi <bossi.ernestog@gmail.com>
 
 """
-from urlparse import urlunparse
-from mercury import *
-from mercury.useful import common
+from urllib.parse import urlunparse
+from mercury.config.AppContext import getMercuryLogger
 import ftplib
 
 def handleHTTP(socket,handler,path):
     # path -> (scheme, netloc, path, params, query, fragment)
     handler._connect_to(path.netloc,socket)
     handler.log_request()
-    socket.send("%s %s %s\r\n" % (handler.command,
-                               urlunparse(('', '', path,
-                                                    path.params, path.query,
-                                                    '')),
-                               handler.request_version))
+
+    content = "%s %s %s\r\n" % (handler.command,
+                               urlunparse(('', '', path.path, path.params, path.query, '')),
+                               handler.request_version)
+    socket.send(str.encode(content))
     handler.headers['Connection'] = 'close'
     del handler.headers['Proxy-Connection'] #TODO: use a decorator to be able to modify the package status
                                             #TODO: Add hook to delegate enabled plug-ins
     for key_val in handler.headers.items():
-        socket.send("%s: %s\r\n" % key_val)
-    socket.send("\r\n")
+        socket.send(str.encode("%s: %s\r\n" % key_val))
+    socket.send(str.encode("\r\n"))
     handler._read_write(socket)
 
 
@@ -49,5 +48,5 @@ def handleFTP(socket,handler,path):
             if handler.command == "GET":
                 ftp.retrbinary ("RETR %s"%path, handler.connection.send)
             ftp.quit ()
-        except Exception, e:
-            common.getLogger().log_warning("FTP Exception: %s",e)
+        except Exception as e:
+            getMercuryLogger().log_warning("FTP Exception: %s",e)
