@@ -3,7 +3,7 @@
    :platform: Linux
    :synopsis: HTTP/S and FTP local Proxy
    :copyright: (c) 2012-2013 by Ernesto Bossi.
-   :license: MIT.
+   :license: BSD.
 
    special thanks to Suzuki, Hisao
 

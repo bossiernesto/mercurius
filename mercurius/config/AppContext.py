@@ -3,7 +3,7 @@
    :platform: Linux
    :synopsis: AppContext using configParser
    :copyright: (c) 2012 by Ernesto Bossi.
-   :license: MIT.
+   :license: BSD.
 
 .. moduleauthor:: Ernesto Bossi <bossi.ernestog@gmail.com>
 
