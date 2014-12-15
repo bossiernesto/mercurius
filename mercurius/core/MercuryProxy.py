@@ -15,17 +15,20 @@ from mercurius.config.AppContext import *
 from .ProxyHandler import ProxyHandler
 import socket
 
-#ThreadedHTTPServer
-class MercuryProxyServer(ThreadingMixIn,HTTPServer):
+# ThreadedHTTPServer
+class MercuryProxyServer(ThreadingMixIn, HTTPServer):
     """Threaded HTTPServer to thread many requests"""
     pass
 
+
 def buildMercuryServer():
-    hostname=socket.gethostname()
-    port=appContext.getInstance().get(MERCURY,"port")
-    mercuryInstance=MercuryProxyServer((hostname,port),ProxyHandler)
+    hostname = socket.gethostname()
+    port = appContext.getInstance().get(MERCURY, "port")
+    mercuryInstance = MercuryProxyServer((hostname, port), ProxyHandler)
     return mercuryInstance
+
 
 def execMercury():
     import http.server
+
     http.server.test(ProxyHandler, MercuryProxyServer)

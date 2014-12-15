@@ -159,7 +159,7 @@ def _removeSingleton(cls):
         _lockForSingletons.release()
 
 def forgetAllSingletons():
-    '''This is useful in tests, since it is hard to know which singletons need to be cleared to make a test work.'''
+    '''This is useful in test, since it is hard to know which singletons need to be cleared to make a test work.'''
     _lockForSingletons.acquire()
     try:
         for cls in _stSingletons.copy():

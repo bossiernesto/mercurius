@@ -2,13 +2,13 @@
 .. module:: AppContext
    :platform: Linux
    :synopsis: AppContext using configParser
-   :copyright: (c) 2012 by Ernesto Bossi.
+   :copyright: (c) 2012-2014 by Ernesto Bossi.
    :license: BSD.
 
 .. moduleauthor:: Ernesto Bossi <bossi.ernestog@gmail.com>
 
 """
-__version__ = '0.0.1'
+__version__ = '0.1.0'
 import configparser
 import io
 import inspect
@@ -31,7 +31,7 @@ LOG = 'Log'
 MERCURY = 'MERCURY'
 
 #Mercurius Server Settings
-PROTOCOL_VERSION = 'Protocol_Version'
+PROTOCOL_VERSION = b'Protocol_Version'
 
 setting_template = [
     (LOG, [('log_file', MERCURY_ROOT + '/logfile.log'), ('log_name', 'mercury_log'), ('output_stdout', False)]),

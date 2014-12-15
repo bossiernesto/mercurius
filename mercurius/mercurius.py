@@ -13,7 +13,7 @@ class Mercurius:
         appContext.getInstance().build_defaultsettings()
         log_name = bytedecode(appContext.get(LOG, b'log_name'))
         log_file = bytedecode(appContext.get(LOG, b'log_file'))
-        logger = ColoredLogger('MERCURY_LOGGER', log_file)
+        logger = ColoredLogger(log_name, log_file)
 
         file_handler = logging.FileHandler(logger.fileName)
         file_handler.setFormatter(logging.Formatter(FORMAT,"%Y-%m-%d %H:%M:%S"))
