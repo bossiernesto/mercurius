@@ -1,5 +1,6 @@
 mercurius
 =========
+[![Build Status](https://travis-ci.org/bossiernesto/mercurius.svg)](https://travis-ci.org/bossiernesto/mercurius)
 
 Simple HTTP/S and FTP Local Proxt
 
