@@ -12,5 +12,5 @@ setup(name="mercurius",
       classifiers=["Development Status :: 2 - Pre-Alpha",
                    "Environment :: Console",
                    "License :: OSI Approved :: BSD License"],
-      requires=["http-parser", "pyparsing"]
+      requires=["httpparser", "pyparsing"]
 )
