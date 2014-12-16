@@ -10,14 +10,12 @@
 .. moduleauthor:: Ernesto Bossi <bossi.ernestog@gmail.com>
 
 """
-
 from http.server import BaseHTTPRequestHandler
 from mercurius.exceptions import MercuryUnsupportedService, MercuryConnectException
-from .MercuryHandlers import *
+from .MercuriusHandlers import *
 import socket, select, urllib.parse
 from mercurius.core import *
 from mercurius.config.AppContext import *
-
 
 class ProxyHandler(BaseHTTPRequestHandler):
     __base = BaseHTTPRequestHandler
@@ -66,7 +64,7 @@ class ProxyHandler(BaseHTTPRequestHandler):
             if appContext.getInstance().get(MERCURY, 'verbose'):
                 self.wfile.write(str.encode("Proxy-agent: %s\r\n" % self.version_string()))
             self.wfile.write(str.encode("\r\n"))
-            self._read_write(sock, 300)
+            self._read_write(sock, 300, path=self.path)
         except MercuryConnectException:
             self.logger.error("Unable to establish connection with host %s", self.path)
         finally:
@@ -102,7 +100,7 @@ class ProxyHandler(BaseHTTPRequestHandler):
         dispatch = self.protocolDispatcher[scheme]  # get handler function according to scheme
         dispatch(socket, handler, path)  # call it
 
-    def _read_write(self, soc, max_idling=20, local=False):
+    def _read_write(self, soc, max_idling=20, local=False, path=None):
         iw = [self.connection, soc]
         local_data = b''
         debug_data = b''
@@ -128,12 +126,22 @@ class ProxyHandler(BaseHTTPRequestHandler):
                         count = 0
             if count == max_idling:
                 # this is now a simple print, in the future it should be reifying this to an object, parse the http header to able to process it
-                print(debug_data.decode('utf-8', 'ignore'))
+                #print(debug_data.decode('utf-8', 'ignore'))
+                self.reify_raw_data(debug_data, path)
                 break
         if local:
             return local_data
-        print(debug_data.decode('utf-8', 'ignore'))
+        #print(debug_data.decode('utf-8', 'ignore'))
+        self.reify_raw_data(debug_data, path)
         return None
+
+    def reify_raw_data(self, raw_data, path=None):
+        from mercurius.core.MercuriusHttpPacket import MercuriusHttpPacket
+
+        packet = MercuriusHttpPacket(raw_data, path)
+        self.server.init_dao()
+        self.server.packet_dao.add_packet(packet)
+        print(len(self.server.packet_dao.packets))
 
     def format_log(self, format, *args):
         return "{0} - - [{1}] {2}\n".format(self.address_string(), self.log_date_time_string(), format % args[0])

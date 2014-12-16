@@ -2,7 +2,7 @@ import sys
 from .config.AppContext import *
 from .logger.coloredLogger import *
 from logging import FileHandler, INFO
-from mercurius.core.MercuryProxy import execMercury
+from mercurius.core.MercuriusProxy import execMercury
 from .daemon import *
 from mercurius.useful.common import bytedecode
 

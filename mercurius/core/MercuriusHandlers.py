@@ -24,12 +24,16 @@ def handleHTTP(socket, handler, path):
                                 handler.request_version)
     socket.send(encode_str(content))
     handler.headers['Connection'] = 'close'
+    del handler.headers['User-Agent']
+    handler.headers['User-Agent'] = 'Duck 1.0'
+
     del handler.headers['Proxy-Connection']  # TODO: use a decorator to be able to modify the package status
     # TODO: Add hook to delegate enabled plug-ins
+    print(handler.headers)
     for key_val in handler.headers.items():
         socket.send(encode_str("%s: %s\r\n" % key_val))
     socket.send(encode_str("\r\n"))
-    handler._read_write(socket)
+    handler._read_write(socket, path=path)
 
 
 def handleFTP(socket, handler, path):

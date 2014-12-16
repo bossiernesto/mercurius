@@ -14,21 +14,24 @@ from http.server import HTTPServer
 from mercurius.config.AppContext import *
 from .ProxyHandler import ProxyHandler
 import socket
+from mercurius.core.MercutyPacketsDao import MercuriusPacketsDao
 
 # ThreadedHTTPServer
-class MercuryProxyServer(ThreadingMixIn, HTTPServer):
+class MercuriusProxyServer(ThreadingMixIn, HTTPServer):
     """Threaded HTTPServer to thread many requests"""
-    pass
+    def init_dao(self):
+        if not hasattr(self, 'packet_dao'):
+            self.packet_dao = MercuriusPacketsDao()
 
 
 def buildMercuryServer():
     hostname = socket.gethostname()
     port = appContext.getInstance().get(MERCURY, "port")
-    mercuryInstance = MercuryProxyServer((hostname, port), ProxyHandler)
+    mercuryInstance = MercuriusProxyServer((hostname, port), ProxyHandler)
     return mercuryInstance
 
 
 def execMercury():
     import http.server
 
-    http.server.test(ProxyHandler, MercuryProxyServer)
+    http.server.test(ProxyHandler, MercuriusProxyServer)

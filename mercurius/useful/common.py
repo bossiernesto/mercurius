@@ -19,4 +19,4 @@ def bytedecode(bytestring):
     return str(bytestring,'utf-8')
 
 def encode_str(string):
-    str.encode(string)
+    return str.encode(string)
