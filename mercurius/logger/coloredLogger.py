@@ -15,7 +15,8 @@ import logging
 from . import coloredFormater as c
 from .loggerDecorator import AbstractLogger
 
-FORMAT = "[$BOLD%(name)-s$RESET][%(levelname)-s]  %(message)s ($BOLD%(filename)s$RESET:%(lineno)d) at %(asctime)-15s"
+OLD_FORMAT = "[$BOLD%(name)-s$RESET][%(levelname)-s]  %(message)s ($BOLD%(filename)s$RESET:%(lineno)d) at %(asctime)-15s"
+FORMAT = "[$BOLD%(name)-s$RESET][%(levelname)-s: %(asctime)-15s] %(message)s."
 
 # Custom logger class with multiple destinations
 class ColoredLogger(AbstractLogger):

@@ -5,6 +5,7 @@ from logging import FileHandler, DEBUG
 from mercurius.core.MercuriusProxy import execMercury
 from mercurius.useful.common import bytedecode
 from mercurius.gui.qt import *
+import threading
 
 class QtHandler(logging.Handler):
     def __init__(self):
@@ -13,8 +14,6 @@ class QtHandler(logging.Handler):
         record = self.format(record)
         if record: XStream.stdout().write('%s\n'%record)
         # originally: XStream.stdout().write("{}\n".format(record))
-
-
 
 class XStream(QObject):
     _stdout = None
@@ -124,14 +123,19 @@ class MercuriusGui(QMainWindow):
         self.statusbar.setObjectName("statusbar")
         self.setStatusBar(self.statusbar)
 
+    def closeEvent(self, event):
+        reply = QtGui.QMessageBox.question(self, 'Exit Mercurius',
+            "Are you sure to quit?", QtGui.QMessageBox.Yes |
+            QtGui.QMessageBox.No, QtGui.QMessageBox.No)
 
-    def close(self):
-        self.daemon._stop()
-        super().close()
-
+        if reply == QtGui.QMessageBox.Yes:
+            self.daemon_thread._stop()
+            event.accept()
+            self.destroy()
+        else:
+            event.ignore()
 
     def _start_daemon(self):
-        import threading
 
         appContext.getInstance().build_defaultsettings()
         log_name = bytedecode(appContext.get(LOG, b'log_name'))
@@ -145,10 +149,10 @@ class MercuriusGui(QMainWindow):
         logger.setLevel(DEBUG)
         setMercuryLogger(logger)
         #instantiate a mercurius Proxy
-        self.daemon = threading.Thread(name='daemon', target=execMercury)
-        self.daemon.daemon = True
+        self.daemon_thread = threading.Thread(name='daemon', target=execMercury)
+        self.daemon_thread.daemon = True
 
-        self.daemon.start()
+        self.daemon_thread.start()
 
 if ( __name__ == '__main__' ):
 
@@ -159,6 +163,3 @@ if ( __name__ == '__main__' ):
     myWidget = MercuriusGui()
     myWidget.show()
     app.exec_()
-
-    if ( app ):
-        app.exec_()
