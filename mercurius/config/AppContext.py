@@ -30,7 +30,7 @@ DOCUMENTAL_DB = "DocumentalDB"
 LOG = 'Log'
 MERCURY = 'MERCURY'
 
-#Mercurius Server Settings
+# Mercurius Server Settings
 PROTOCOL_VERSION = b'Protocol_Version'
 
 setting_template = [
@@ -65,7 +65,7 @@ class appContext(Singleton):
             f = io.BytesIO(filename)
         else:
             f = open(filename, 'w+')
-        self.config_parser.readfp(f)
+        self.config_parser.read_file(f)
 
     def sectionExists(self, section):
         return section in self.config_parser.sections()
@@ -96,7 +96,7 @@ class appContext(Singleton):
             try:
                 return self.get(section, key)
             except ConfigError:
-                pass #keep iterating
+                pass  #keep iterating
         raise ConfigError("No value with key {0} on AppContext".format(key))
 
     @staticmethod
@@ -116,7 +116,7 @@ class appContext(Singleton):
                 self._get_value(section, key)
                 return section
             except ConfigError:
-                pass    #Keep iterating
+                pass  #Keep iterating
         raise ConfigError("No section found for  key {1} on AppContext".format(key))
 
     #delete objects
@@ -128,7 +128,7 @@ class appContext(Singleton):
             section = self._get_section(option)
             self.remove(section, option)
         except ConfigError:
-            pass    #Because it's a delete method if it can't find the option in the AppContext then it doesn't exists
+            pass  #Because it's a delete method if it can't find the option in the AppContext then it doesn't exists
 
     def clear_section(self, section):
         if self.sectionExists(section):

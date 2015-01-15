@@ -1,9 +1,11 @@
-__author__ = 'ernesto'
-
 
 class MercuriusPacketsDao(object):
     def __init__(self):
-        self.packets = dict()
+        self.requests = dict()
+        self.responses = dict()
 
-    def add_packet(self, packet):
-        self.packets[id(packet)] = packet
+    def add_request(self, packet):
+        self.requests[id(packet)] = packet
+
+    def add_response(self, response):
+        self.responses[id(response)] = response

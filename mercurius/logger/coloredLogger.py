@@ -1,4 +1,6 @@
 import logging
+from . import coloredFormater as c
+from .loggerDecorator import AbstractLogger
 from .coloredFormater import *
 from abc import ABCMeta
 
@@ -11,10 +13,6 @@ class AbstractLogger(logging.Logger):
 
 
 # Custom logger class with multiple destinations
-import logging
-from . import coloredFormater as c
-from .loggerDecorator import AbstractLogger
-
 OLD_FORMAT = "[$BOLD%(name)-s$RESET][%(levelname)-s]  %(message)s ($BOLD%(filename)s$RESET:%(lineno)d) at %(asctime)-15s"
 FORMAT = "[$BOLD%(name)-s$RESET][%(levelname)-s: %(asctime)-15s] %(message)s."
 

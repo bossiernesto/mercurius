@@ -3,7 +3,6 @@ from mercurius.config.AppContext import *
 from mercurius.useful import singleton
 from configparser import DuplicateSectionError
 
-
 class AppContextTestCase(unittest.TestCase):
     def setUp(self):
         self.app = appContext.getInstance()

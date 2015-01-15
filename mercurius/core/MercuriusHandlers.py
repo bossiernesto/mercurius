@@ -24,8 +24,6 @@ def handleHTTP(socket, handler, path):
                                 handler.request_version)
     socket.send(encode_str(content))
     handler.headers['Connection'] = 'close'
-    del handler.headers['User-Agent']
-    handler.headers['User-Agent'] = 'Duck 1.0'
 
     del handler.headers['Proxy-Connection']  # TODO: use a decorator to be able to modify the package status
     # TODO: Add hook to delegate enabled plug-ins
@@ -57,3 +55,23 @@ def handleFTP(socket, handler, path):
             ftp.quit()
         except Exception as e:
             getMercuryLogger().log_warning("FTP Exception: %s", e)
+
+def GenericHandler(object):
+
+    def __init__(self):
+        pass
+
+    def handle_object(self, object_to_modify):
+        raise NotImplemented
+
+def handleHTTPRequest():
+    pass
+
+def handleHTTPSRequest():
+    pass
+
+def handleHTTPResponse():
+    pass
+
+def handleHTTPSResponse():
+    pass

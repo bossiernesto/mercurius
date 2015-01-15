@@ -1,8 +1,8 @@
 """
-.. module:: Onyx Logger Decorator
+.. module:: Mercurius Logger Decorator
    :platform: Linux
    :synopsis: decorator to show up information in a fashioned way
-   :copyright: (c) 2013-2014 by Ernesto Bossi.
+   :copyright: (c) 2013-2015 by Ernesto Bossi.
    :license: BSD.
 
 .. moduleauthor:: Ernesto Bossi <bossi.ernestog@gmail.com>
