@@ -7,7 +7,7 @@ class HTTPParser(object):
         headers = {}
         name = ''
         while 1:
-            line = input.readline()
+            line = rfile.readline()
             if line == '\r\n' or line == '\n':
                 break
             if line[0] in ' \t':
