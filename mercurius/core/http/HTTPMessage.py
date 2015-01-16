@@ -104,7 +104,7 @@ class HTTPResponseBuilder(HTTPMessageBuilder):
         code = raw_response.status
         message = raw_response.reason
 
-        self.build_package(code, message, protocol, raw_response.msg.headers, body)
+        return self.build_package(code, message, protocol, raw_response.msg.headers, body)
 
     def build_package(self, code, message, protocol, headers, body):
         response = HTTPResponse(code, message, protocol, headers, body)
@@ -223,6 +223,17 @@ class HTTPRequest(HTTPMessage):
         if not hasattr(self, 'params'):
             self.set_params()
         return self.params
+
+    def get_path(self):
+        parsed = urlibparse.urlparse(self.url)
+        path = parsed.path
+        if len(parsed.params) > 0:
+            path += ";{0}".format(parsed.params)
+        if len(parsed.query) > 0:
+            path += "?{0}".format(parsed.query)
+        if len(parsed.fragment) > 0:
+            path += "#{0}".format(parsed.fragment)
+        return path
 
     def clone_request(self):
         return self.clone_message()

@@ -2,7 +2,7 @@
 .. module:: Mercury Proxy Handler
    :platform: Linux
    :synopsis: HTTP/S and FTP local Proxy
-   :copyright: (c) 2012-2013 by Ernesto Bossi.
+   :copyright: (c) 2013-2015 by Ernesto Bossi.
    :license: BSD.
 
    special thanks to Suzuki, Hisao
@@ -11,7 +11,7 @@
 
 """
 
-from mercurius.exceptions import MercuryUnsupportedService, MercuryConnectException
+from mercurius.exceptions import MercuryUnsupportedService, MercuryConnectException, MercuriusRequestException
 from .MercuriusHandlers import *
 from socketserver import StreamRequestHandler
 from mercurius.config.AppContext import *
@@ -20,6 +20,7 @@ from mercurius.core.http import HTTPMessage
 import select
 import ssl
 from http.client import HTTPConnection, HTTPSConnection, HTTPException
+from urllib.parse import urlencode
 
 DEFAULT_CERT_FILE = './certs/cert.pem'
 
@@ -71,31 +72,6 @@ class ProxyHandler(StreamRequestHandler):
 
         return connection
 
-    def _create_https_connection(self):
-        """
-        https full handshake
-
-        Client                                  Server
-
-        ClientHello              -------->
-                                                ServerHello
-                                                Certificate*
-                                                ServerKeyExchange*
-                                                CertificateRequest*
-                                 <--------      ServerHelloDone
-        Certificate*
-        ClientKeyExchange
-        CertificateVerify*
-        [ChangeCipherSpec]
-        Finished                  -------->
-                                               [ChangeCipherSpec]
-                                  <--------             Finished
-        Application Data          <------->     Application Data
-
-        :return:
-        """
-        pass
-
     def send_response(self, response):
         self.wfile.write(response)
 
@@ -121,7 +97,7 @@ class ProxyHandler(StreamRequestHandler):
             self.increment_packet_served()
 
         try:
-            self.request = HTTPMessage.HTTPRequestBuilder.build(self.rfile, self.logger)
+            self.request = HTTPMessage.HTTPRequestBuilder().build(self.rfile, self.logger)
             if self.request is None:
                 return None
         except Exception as e:
@@ -160,23 +136,30 @@ class ProxyHandler(StreamRequestHandler):
 
         return dispatch(response, request)
 
-    # def _connect_to(self, netloc, sock):
-    # host_port = socketcommon.host_port(netloc)
-    # self.logger.info("connect to %s:%d", host_port[0], host_port[1])
-    #     try:
-    #         sock.connect(host_port)
-    #     except socket.error as arg:
-    #         try:
-    #             msg = arg[1]
-    #         except:
-    #             msg = arg
-    #         self.send_error(404, msg)
-    #         raise MercuryConnectException()
-
     # Verbs implementation
 
     def do_CONNECT(self, host, port, request):
+        """
+        https full handshake
 
+        Client                                  Server
+
+        ClientHello              -------->
+                                                ServerHello
+                                                Certificate*
+                                                ServerKeyExchange*
+                                                CertificateRequest*
+                                 <--------      ServerHelloDone
+        Certificate*
+        ClientKeyExchange
+        CertificateVerify*
+        [ChangeCipherSpec]
+        Finished                  -------->
+                                               [ChangeCipherSpec]
+                                  <--------             Finished
+        Application Data          <------->     Application Data
+
+        """
         socket_req = self.request
         certfilename = DEFAULT_CERT_FILE
         socket_ssl = ssl.wrap_socket(socket_req, server_side=True, certfile=certfilename,
@@ -201,28 +184,54 @@ class ProxyHandler(StreamRequestHandler):
 
         self.setup()
         self.handle()
-        #     if appContext.getInstance().get(MERCURY, 'verbose'):
-        #         self.wfile.write(str.encode("Proxy-agent: %s\r\n" % self.version_string()))
+        # if appContext.getInstance().get(MERCURY, 'verbose'):
+        # self.wfile.write(str.encode("Proxy-agent: %s\r\n" % self.version_string()))
 
+    def make_request(self, connection, method, path, parameters, headers):
+        try:
+            return self._build_request(connection, method, path, parameters, headers)
+        except IOError as e:
+            self.logger.error('Failed building raw request to send. Reason: {0}'.format(e.__str__()))
+            raise MercuriusRequestException(e.__str__())
 
-    def make_request(self, connection, method, parameters, headers):
-        pass
+    def _build_request(self, connection, method, path, parameters, headers):
+        connection.putrequest(method, path, skip_host=True, skip_accept_encoding=True)
+        for header, v in headers.iteritems():
+            # auto-fix content-length
+            if header.lower() == 'content-length':
+                connection.putheader(header, str(len(parameters)))
+            else:
+                connection.putheader(header, v)
+        connection.endheaders()
+
+        if len(parameters) > 0:
+            connection.send(parameters)
+
+    def _get_response(self, connection):
+        raw_response = connection.getresponse()
+        return HTTPMessage.HTTPResponseBuilder().build(raw_response, self.logger)
 
     def do_GET(self, host, port, request):
         from mercurius.core.http.HTTPMessage import GET_VERB
 
         try:
             connection = self._create_connection(host, port)
-            self.make_request(connection, GET_VERB, '', request.headers)
+            self.make_request(connection, GET_VERB, request.get_path(), '', request.headers)
             response = self._get_response(connection)
 
-            response_modified = self._delegate_response_protocol(response, request)
-            data = response_modified.serialize()
+            modified_response = self._delegate_response_protocol(response, request)
+            self.add_response_to_dao(modified_response)
+            data = modified_response.serialize()
             return data
 
-        except (MercuryConnectException, Exception) as e:
-            pass  #pass for now...
-
+        except MercuryConnectException as e:
+            self.logger.error("Error Connecting to Host: {0}. Reason: {1}".format(self.host, e.__str__()))
+        except MercuriusRequestException as e:
+            self.logger.error(
+                "Error Requesting to host {0}, on port {1}. Reason: {2}".format(self.host, self.port, e.__str__()))
+        except HTTPException as e:
+            self.logger.error(
+                "Error on processing the response for host {0}. Reason {1}".format(self.host, e.__str__()))
 
     do_HEAD = do_GET
     do_UPDATE = do_GET
@@ -231,72 +240,37 @@ class ProxyHandler(StreamRequestHandler):
     def do_POST(self, host, port, request):
         from mercurius.core.http.HTTPMessage import POST_VERB
 
-        connection = self._create_connection(host, port)
-        ## TODO: Continue
+        try:
+            connection = self._create_connection(host, port)
+            parameters = urlencode(request.get_params(POST_VERB))
+            self.make_request(connection, POST_VERB, request.get_path(), parameters, request.headers)
+            response = self._get_response(connection)
 
+            modified_response = self._delegate_response_protocol(response, request)
+            self.add_response_to_dao(modified_response)
+            data = modified_response.serialize()
+            return data
 
-    def delegateActionByScheme(self, scheme, socket, handler, path):
-        dispatch = self.protocolDispatcher[scheme]  # get handler function according to scheme
-        dispatch(socket, handler, path)  # call it
-
-    # def _read_write(self, soc, max_idling=20, local=False, path=None):
-    #     iw = [self.connection, soc]
-    #     local_data = b''
-    #     debug_data = b''
-    #     ow = []
-    #     count = 0
-    #     while 1:
-    #         count += 1
-    #         (ins, _, exs) = select.select(iw, ow, iw, 1)
-    #         if exs: break
-    #         if ins:
-    #             for i in ins:
-    #                 if i is soc:
-    #                     out = self.connection
-    #                 else:
-    #                     out = soc
-    #                 data = i.recv(8192)
-    #                 debug_data += data
-    #                 if data:
-    #                     if local:
-    #                         local_data += data
-    #                     else:
-    #                         out.send(data)
-    #                     count = 0
-    #         if count == max_idling:
-    #             # this is now a simple print, in the future it should be reifying this to an object, parse the http header to able to process it
-    #             #print(debug_data.decode('utf-8', 'ignore'))
-    #             self.reify_raw_data(debug_data, path)
-    #             break
-    #     if local:
-    #         return local_data
-    #     #print(debug_data.decode('utf-8', 'ignore'))
-    #     self.reify_raw_data(debug_data, path)
-    #     return None
+        except MercuryConnectException as e:
+            self.logger.error("Error Connecting to Host: {0}. Reason: {1}".format(self.host, e.__str__()))
+        except MercuriusRequestException as e:
+            self.logger.error(
+                "Error Requesting to host {0}, on port {1}. Reason: {2}".format(self.host, self.port, e.__str__()))
+        except HTTPException as e:
+            self.logger.error(
+                "Error on processing the response for host {0}. Reason {1}".format(self.host, e.__str__()))
 
 
     def add_request_to_dao(self, request):
         self.server.packet_dao.add_request(request)
 
+
     def add_response_to_dao(self, response):
         self.server.packet_dao.add_response(response)
 
+
     def version_string(self):
         from mercurius.useful.common import bytedecode
+        from mercurius.core.http.HTTPMessage import HTTP_VERSION
 
-        return bytedecode(self.server_version) + ' ' + self.sys_version
-
-    def format_log(self, format, *args):
-        return "{0} - - [{1}] {2}\n".format(self.address_string(), self.log_date_time_string(), format % args[0])
-
-    def log_error(self, format, *args):
-        self.logger.error(self.format_log(format, args))
-
-    def log_message(self, format, *args):
-        self.logger.info(self.format_log(format, args))
-
-    def log_request(self, code='-', size='-'):
-        """Log an accepted request.
-        This is called by send_response().
-        """
-        self.logger.info('"%s" %s %s', self.requestline, str(code), str(size))
+        return bytedecode(self.server_version) + ' ' + HTTP_VERSION

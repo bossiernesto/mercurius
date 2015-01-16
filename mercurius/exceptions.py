@@ -12,6 +12,9 @@ class MercuryConnectException(Exception):
     def __init__(self, *args, **kwargs):
         Exception.__init__(self, *args, **kwargs)
 
+class MercuriusRequestException(Exception):
+    def __init__(self, *args, **kwargs):
+        Exception.__init__(self, *args, **kwargs)
 
 class MercuriusHTTPException(Exception):
     def __init__(self, *args, **kwargs):

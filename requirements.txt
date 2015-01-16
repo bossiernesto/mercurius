@@ -1,3 +1,1 @@
-http-parser
-pyparsing
 coveralls
