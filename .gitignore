@@ -1,6 +1,6 @@
 *.py[co]
 .idea
-
+_remove
 # Packages
 *.egg
 *.egg-info
@@ -16,7 +16,7 @@ develop-eggs
 
 # Installer logs
 pip-log.txt
-
+test
 # Unit test / coverage reports
 .coverage
 .tox

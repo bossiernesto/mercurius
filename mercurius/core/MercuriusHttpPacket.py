@@ -1,11 +1,7 @@
 __author__ = 'ernesto'
 
 import socket
-
-try:
-    from http_parser.parser import HttpParser
-except ImportError:
-    from http_parser.pyparser import HttpParser
+from .http.html_parser import HttpParser
 
 
 class MercuriusHttpPacket(object):
@@ -30,4 +26,4 @@ class MercuriusHttpPacket(object):
         return socket.gethostbyname(actual_path)
 
     def __repr__(self):
-        print("{0} {1}".format(self.headers ,self.ip))
+        print("{0} {1}".format(self.headers, self.ip))

@@ -56,22 +56,26 @@ def handleFTP(socket, handler, path):
         except Exception as e:
             getMercuryLogger().log_warning("FTP Exception: %s", e)
 
-def GenericHandler(object):
 
+def GenericHandler(object):
     def __init__(self):
         pass
 
     def handle_object(self, object_to_modify):
         raise NotImplemented
 
+
 def handleHTTPRequest():
     pass
+
 
 def handleHTTPSRequest():
     pass
 
+
 def handleHTTPResponse():
     pass
+
 
 def handleHTTPSResponse():
     pass

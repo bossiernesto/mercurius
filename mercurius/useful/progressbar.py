@@ -1,5 +1,6 @@
 import sys
 
+
 class ProgressBar(object):
     DEFAULT_BAR_LENGTH = float(65)
 

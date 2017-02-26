@@ -11,12 +11,15 @@
 
 import inspect
 
+
 def get_current_method_name():
     """Auxiliary function to not to do DRY"""
     return inspect.stack()[1][3]
 
+
 def bytedecode(bytestring):
-    return str(bytestring,'utf-8')
+    return str(bytestring, 'utf-8')
+
 
 def encode_str(string):
     return str.encode(string)

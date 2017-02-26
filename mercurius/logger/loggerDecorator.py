@@ -37,7 +37,6 @@ class DecoratorLogger(AbstractLogger):
             self.loggers.append(log)
         logging.Logger.__init__(self, name, logging.DEBUG)
 
-
     def execLogger(self, func, msg, *args, **kwargs):
         for logger in self.loggers:
             getattr(logger, func)(msg, args, kwargs)

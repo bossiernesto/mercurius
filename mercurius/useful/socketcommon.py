@@ -1,8 +1,9 @@
 import string
-from  urllib.parse import urlparse
+from urllib.parse import urlparse
+
 
 def host_url_port(url):
-    url_tuple=urlparse(url)
+    url_tuple = urlparse(url)
     host_port = url_tuple[1]
     tokens = string.split(host_port, '@')
     if len(tokens) == 2:
@@ -26,7 +27,7 @@ def host_url_port(url):
 
 
 def host_port(netloc):
-    i=netloc.find(':')
-    if i>=0:
-        return netloc[:i], int(netloc[i+1:])
+    i = netloc.find(':')
+    if i >= 0:
+        return netloc[:i], int(netloc[i + 1:])
     return netloc, 80

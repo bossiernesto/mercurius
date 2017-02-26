@@ -260,14 +260,11 @@ class ProxyHandler(StreamRequestHandler):
             self.logger.error(
                 "Error on processing the response for host {0}. Reason {1}".format(self.host, e.__str__()))
 
-
     def add_request_to_dao(self, request):
         self.server.packet_dao.add_request(request)
 
-
     def add_response_to_dao(self, response):
         self.server.packet_dao.add_response(response)
-
 
     def version_string(self):
         from mercurius.useful.common import bytedecode
